@@ -1,0 +1,33 @@
+{
+  "name": "prospect-mirror",
+  "version": "1.0.0",
+  "description": "Demo Personalization + Competitive Teardown tool for Acquia",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test test/"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "cheerio": "^1.0.0",
+    "chroma-js": "^3.1.2",
+    "chrome-launcher": "^1.1.2",
+    "color-thief-node": "^1.0.4",
+    "compression": "^1.7.5",
+    "cors": "^2.8.5",
+    "css-tree": "^3.1.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "handlebars": "^4.7.8",
+    "helmet": "^8.0.0",
+    "lighthouse": "^12.4.0",
+    "puppeteer": "^24.2.1",
+    "sharp": "^0.33.5",
+    "uuid": "^11.0.5"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

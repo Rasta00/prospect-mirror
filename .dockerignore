@@ -1,0 +1,9 @@
+node_modules
+.env
+.git
+.gitignore
+.dockerignore
+*.log
+.DS_Store
+test/
+.railway/

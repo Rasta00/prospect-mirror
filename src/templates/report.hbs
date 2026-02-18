@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Prospect Mirror Report — {{title}}</title>
+  <style>{{{styles}}}</style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="report-header">
+    <h1>Prospect Mirror Report</h1>
+    <div class="report-subtitle">{{title}}</div>
+    <div class="report-meta">
+      {{url}} &middot; Generated {{date}} &middot; Powered by Acquia
+    </div>
+  </div>
+
+  <!-- Performance Scorecard -->
+  {{#if audit.scores}}
+  <div class="section">
+    <div class="section-title">Performance Scorecard</div>
+    <div class="scores-grid">
+      {{#each audit.scores}}
+      <div class="score-box">
+        <div class="score-value {{scoreClass this}}">{{this}}</div>
+        <div class="score-label">{{@key}}</div>
+      </div>
+      {{/each}}
+    </div>
+
+    {{#if audit.diagnostics}}
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#if audit.diagnostics.fcp}}<tr><td>First Contentful Paint</td><td>{{audit.diagnostics.fcp}}</td></tr>{{/if}}
+        {{#if audit.diagnostics.lcp}}<tr><td>Largest Contentful Paint</td><td>{{audit.diagnostics.lcp}}</td></tr>{{/if}}
+        {{#if audit.diagnostics.tbt}}<tr><td>Total Blocking Time</td><td>{{audit.diagnostics.tbt}}</td></tr>{{/if}}
+        {{#if audit.diagnostics.cls}}<tr><td>Cumulative Layout Shift</td><td>{{audit.diagnostics.cls}}</td></tr>{{/if}}
+        {{#if audit.diagnostics.speedIndex}}<tr><td>Speed Index</td><td>{{audit.diagnostics.speedIndex}}</td></tr>{{/if}}
+      </tbody>
+    </table>
+    {{/if}}
+  </div>
+  {{/if}}
+
+  <!-- Security Headers -->
+  {{#if audit.securityHeaders}}
+  <div class="section">
+    <div class="section-title">Security Assessment</div>
+    <table class="comparison-table">
+      <thead>
+        <tr><th>Security Header</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        {{#each audit.securityHeaders}}
+        <tr>
+          <td><code>{{@key}}</code></td>
+          <td>{{#if this}}&#10003; Present{{else}}&#10007; Missing{{/if}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+  {{/if}}
+
+  <!-- Technology Stack -->
+  {{#if tech.detected}}
+  <div class="section">
+    <div class="section-title">Technology Stack</div>
+    <div class="tech-list">
+      {{#each tech.detected}}
+      <div class="tech-badge">
+        <strong>{{this.name}}</strong>
+        <span style="color:#64748b;font-size:9pt">{{this.category}} &middot; {{this.confidence}}%</span>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  {{/if}}
+
+  <!-- Brand Assets -->
+  <div class="section">
+    <div class="section-title">Brand Analysis</div>
+
+    {{#if brand.colors.palette}}
+    <h3 style="font-size:11pt;margin-bottom:8px">Colors</h3>
+    <div class="color-strip">
+      {{#each brand.colors.palette}}
+      <div>
+        <div class="color-chip" style="background:{{this}}"></div>
+        <div class="color-hex">{{this}}</div>
+      </div>
+      {{/each}}
+    </div>
+    {{/if}}
+
+    {{#if brand.fonts}}
+    <h3 style="font-size:11pt;margin-bottom:8px;margin-top:16px">Typography</h3>
+    <div class="tech-list">
+      {{#each brand.fonts}}
+      <div class="tech-badge">{{this}}</div>
+      {{/each}}
+    </div>
+    {{/if}}
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- Content Analysis -->
+  {{#if content.industry}}
+  <div class="section">
+    <div class="section-title">Content &amp; Business Analysis</div>
+    <table class="comparison-table">
+      <tbody>
+        {{#if content.companyName}}<tr><td><strong>Company</strong></td><td>{{content.companyName}}</td></tr>{{/if}}
+        <tr><td><strong>Industry</strong></td><td>{{content.industry}}{{#if content.subIndustry}} — {{content.subIndustry}}{{/if}}</td></tr>
+        {{#if content.targetAudience}}<tr><td><strong>Target Audience</strong></td><td>{{content.targetAudience}}</td></tr>{{/if}}
+        {{#if content.valueProposition}}<tr><td><strong>Value Proposition</strong></td><td>{{content.valueProposition}}</td></tr>{{/if}}
+        {{#if content.contentMaturity}}<tr><td><strong>Content Maturity</strong></td><td>{{content.contentMaturity}}</td></tr>{{/if}}
+        {{#if content.personalization}}<tr><td><strong>Personalization</strong></td><td>{{content.personalization}}</td></tr>{{/if}}
+      </tbody>
+    </table>
+
+    {{#if content.themes}}
+    <h3 style="font-size:11pt;margin:16px 0 8px">Key Themes</h3>
+    <div class="tech-list">
+      {{#each content.themes}}
+      <div class="tech-badge">{{this}}</div>
+      {{/each}}
+    </div>
+    {{/if}}
+
+    {{#if content.messaging}}
+    <h3 style="font-size:11pt;margin:16px 0 8px">Messaging Analysis</h3>
+    <div class="narrative-block">{{content.messaging}}</div>
+    {{/if}}
+  </div>
+  {{/if}}
+
+  <!-- Competitive Analysis -->
+  {{#if competitive}}
+  <div class="section">
+    <div class="section-title">Competitive Analysis: {{tech.primaryCms}} vs. Acquia</div>
+
+    {{#if competitive.narrative}}
+    <div class="narrative-block">{{competitive.narrative}}</div>
+    {{/if}}
+
+    {{#if competitive.comparison}}
+    <table class="comparison-table" style="margin-top:20px">
+      <thead>
+        <tr>
+          <th>Capability</th>
+          <th>Current Platform ({{tech.primaryCms}})</th>
+          <th class="acquia-col">Acquia</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each competitive.comparison}}
+        <tr>
+          <td><strong>{{this.capability}}</strong></td>
+          <td>{{this.current}}</td>
+          <td class="acquia-col">{{this.acquia}}</td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    {{/if}}
+
+    {{#if competitive.weaknesses}}
+    <h3 style="font-size:11pt;margin:20px 0 8px">Platform Weaknesses Identified</h3>
+    <ul class="bullet-list">
+      {{#each competitive.weaknesses}}
+      <li>{{this}}</li>
+      {{/each}}
+    </ul>
+    {{/if}}
+
+    {{#if competitive.acquiaAdvantages}}
+    <h3 style="font-size:11pt;margin:20px 0 8px">Acquia Advantages</h3>
+    <ul class="bullet-list">
+      {{#each competitive.acquiaAdvantages}}
+      <li>{{this}}</li>
+      {{/each}}
+    </ul>
+    {{/if}}
+
+    {{#if competitive.talkingPoints}}
+    <h3 style="font-size:11pt;margin:20px 0 8px">Recommended Talking Points</h3>
+    <ul class="bullet-list">
+      {{#each competitive.talkingPoints}}
+      <li>{{this}}</li>
+      {{/each}}
+    </ul>
+    {{/if}}
+
+    {{#if competitive.riskFactors}}
+    <h3 style="font-size:11pt;margin:20px 0 8px">Risk Factors &amp; Objection Handling</h3>
+    <ul class="bullet-list">
+      {{#each competitive.riskFactors}}
+      <li>{{this}}</li>
+      {{/each}}
+    </ul>
+    {{/if}}
+  </div>
+  {{/if}}
+
+  <!-- Drupal Demo -->
+  {{#if drupal}}
+  <div class="section">
+    <div class="section-title">Demo Environment</div>
+    <p>A branded Drupal demo has been created with the prospect's content and brand assets.</p>
+    <p style="margin-top:8px"><strong>URL:</strong> <a href="{{drupal.siteUrl}}">{{drupal.siteUrl}}</a></p>
+    <p><strong>Pages Created:</strong> {{drupal.pagesCreated}}</p>
+    <p><strong>Media Uploaded:</strong> {{drupal.mediaUploaded}}</p>
+  </div>
+  {{/if}}
+
+  <!-- Footer -->
+  <div class="report-footer">
+    <p>Generated by Prospect Mirror — An Acquia Sales Engineering Tool</p>
+    <p>{{date}} &middot; Confidential — For Internal Use Only</p>
+  </div>
+
+</body>
+</html>

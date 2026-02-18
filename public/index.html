@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prospect Mirror | Acquia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div id="app">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="logo-group">
+          <svg class="acquia-logo" viewBox="0 0 24 24" width="32" height="32">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6zm4 4h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#0078D4"/>
+          </svg>
+          <span class="app-title">Prospect Mirror</span>
+          <span class="app-subtitle">Demo Personalization + Competitive Analysis</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero / Input Section -->
+    <section id="input-section" class="input-section">
+      <div class="input-container">
+        <h1>Analyze any prospect's website in seconds</h1>
+        <p class="subtitle">Paste a URL to get a branded demo, competitive teardown, and performance scorecard.</p>
+        <form id="analyze-form" class="url-form">
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M8.5 3.5a5 5 0 100 10 5 5 0 000-10zM2 8.5a6.5 6.5 0 1111.58 4.02l3.95 3.95a.75.75 0 11-1.06 1.06l-3.95-3.95A6.5 6.5 0 012 8.5z" fill="currentColor"/></svg>
+            </span>
+            <input type="url" id="url-input" placeholder="https://prospect-website.com" required autocomplete="url">
+            <button type="submit" id="analyze-btn">
+              <span class="btn-text">Analyze</span>
+              <span class="btn-spinner" hidden></span>
+            </button>
+          </div>
+          <div id="input-error" class="input-error" hidden></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Progress Section -->
+    <section id="progress-section" class="progress-section" hidden>
+      <div class="progress-container">
+        <div class="progress-header">
+          <h2>Analyzing <span id="progress-url"></span></h2>
+          <span id="progress-timer" class="timer">0s</span>
+        </div>
+        <div id="progress-phases" class="progress-phases">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results-section" class="results-section" hidden>
+      <div class="results-container">
+
+        <!-- Results Header -->
+        <div class="results-header">
+          <div class="results-title-group">
+            <h2 id="result-site-title"></h2>
+            <a id="result-site-url" href="#" target="_blank" class="result-url"></a>
+          </div>
+          <div class="results-actions">
+            <button id="export-pdf-btn" class="btn btn-secondary">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 14h12M8 2v9m0 0l3-3m-3 3L5 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Export PDF
+            </button>
+            <button id="new-analysis-btn" class="btn btn-ghost">New Analysis</button>
+          </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <nav class="tabs">
+          <button class="tab active" data-tab="overview">Overview</button>
+          <button class="tab" data-tab="brand">Brand</button>
+          <button class="tab" data-tab="tech">Tech Stack</button>
+          <button class="tab" data-tab="audit">Scorecard</button>
+          <button class="tab" data-tab="competitive">Competitive</button>
+          <button class="tab" data-tab="content">Content</button>
+          <button class="tab" data-tab="drupal">Demo Site</button>
+        </nav>
+
+        <!-- Tab Panels -->
+        <div class="tab-panels">
+
+          <!-- Overview -->
+          <div id="panel-overview" class="tab-panel active">
+            <div class="overview-grid">
+              <div class="overview-card" id="card-brand-summary">
+                <h3>Brand</h3>
+                <div id="brand-preview"></div>
+              </div>
+              <div class="overview-card" id="card-tech-summary">
+                <h3>Tech Stack</h3>
+                <div id="tech-preview"></div>
+              </div>
+              <div class="overview-card" id="card-scores-summary">
+                <h3>Scores</h3>
+                <div id="scores-preview"></div>
+              </div>
+              <div class="overview-card wide" id="card-competitive-summary">
+                <h3>Competitive Summary</h3>
+                <div id="competitive-preview"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Brand -->
+          <div id="panel-brand" class="tab-panel">
+            <div class="brand-grid">
+              <div class="brand-section">
+                <h3>Colors</h3>
+                <div id="brand-colors" class="color-palette"></div>
+              </div>
+              <div class="brand-section">
+                <h3>Logo</h3>
+                <div id="brand-logo" class="logo-preview"></div>
+              </div>
+              <div class="brand-section">
+                <h3>Typography</h3>
+                <div id="brand-fonts" class="font-list"></div>
+              </div>
+              <div class="brand-section wide">
+                <h3>Hero Images</h3>
+                <div id="brand-heroes" class="hero-gallery"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tech Stack -->
+          <div id="panel-tech" class="tab-panel">
+            <div id="tech-details" class="tech-grid"></div>
+          </div>
+
+          <!-- Scorecard / Audit -->
+          <div id="panel-audit" class="tab-panel">
+            <div class="audit-grid">
+              <div class="gauge-row" id="audit-gauges"></div>
+              <div class="audit-details" id="audit-details"></div>
+            </div>
+          </div>
+
+          <!-- Competitive -->
+          <div id="panel-competitive" class="tab-panel">
+            <div id="competitive-details"></div>
+          </div>
+
+          <!-- Content Analysis -->
+          <div id="panel-content" class="tab-panel">
+            <div id="content-details"></div>
+          </div>
+
+          <!-- Drupal Demo -->
+          <div id="panel-drupal" class="tab-panel">
+            <div id="drupal-details"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
