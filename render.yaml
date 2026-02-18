@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: prospect-mirror
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: ENABLE_AI_ANALYSIS
+        value: "false"
+      - key: DRUPAL_BASE_URL
+        value: "https://demo.acquia-sites.com"
+      - key: DRUPAL_USERNAME
+        value: "admin"
+      - key: ENABLE_DRUPAL_POPULATION
+        value: "true"
+      - key: PUPPETEER_EXECUTABLE_PATH
+        value: "/usr/bin/chromium"
+      - key: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
+        value: "true"
