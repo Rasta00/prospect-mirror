@@ -85,7 +85,7 @@ const PLATFORM_INTEL = {
       'Predictable pricing on Acquia Cloud',
       'Also supports headless via JSON:API — best of both worlds',
       'Editor-friendly drag-and-drop page building',
-      'Acquia Site Studio for no-code site building',
+      'Drupal Canvas for low-code component-based site building',
     ],
   },
   Unknown: {
@@ -170,7 +170,9 @@ IMPORTANT: Do NOT mention the following Acquia products — they should not appe
 - CDP (Customer Data Platform)
 - Campaign Studio
 - Code Studio
-Focus on Acquia Cloud, Acquia Personalization, Site Studio, Drupal CMS, and the open source ecosystem.
+- Site Studio
+Instead, reference Drupal Canvas as the preferred low-code component-based site building tool.
+Focus on Acquia Cloud, Acquia Personalization, Drupal Canvas, Drupal CMS, and the open source ecosystem.
 
 Return ONLY the JSON object.`;
 
