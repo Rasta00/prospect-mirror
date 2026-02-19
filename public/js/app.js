@@ -155,6 +155,22 @@
 
     eventSource = new EventSource(`/api/status/${jobId}`);
 
+    // Handle snapshot — catches up on phases that already fired
+    eventSource.addEventListener('snapshot', (e) => {
+      const data = JSON.parse(e.data);
+      if (data.phases) {
+        for (const [phase, info] of Object.entries(data.phases)) {
+          if (info.status === 'done') {
+            updatePhase(phase, 'done', info.detail);
+          } else if (info.status === 'error') {
+            updatePhase(phase, 'error', info.error);
+          } else if (info.status === 'running') {
+            updatePhase(phase, 'running', info.detail || info.label);
+          }
+        }
+      }
+    });
+
     eventSource.addEventListener('phase:start', (e) => {
       const data = JSON.parse(e.data);
       updatePhase(data.phase, 'running', data.label);
@@ -189,19 +205,39 @@
       resetUI();
     });
 
-    eventSource.onerror = () => {
-      // SSE may close when job is done; check status
-      setTimeout(async () => {
-        try {
-          const res = await fetch(`/api/status/${jobId}`);
-          const data = await res.json();
-          if (data.status === 'done') {
-            eventSource.close();
-            clearInterval(timerInterval);
-            await fetchAndShowResults(jobId);
+    // Poll as fallback — SSE can miss events on some proxies
+    const pollInterval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/status/${jobId}`);
+        const data = await res.json();
+        if (data.phases) {
+          for (const [phase, info] of Object.entries(data.phases)) {
+            if (info.status === 'done') {
+              updatePhase(phase, 'done', info.detail);
+            } else if (info.status === 'error') {
+              updatePhase(phase, 'error', info.error);
+            } else if (info.status === 'running') {
+              updatePhase(phase, 'running', info.detail || info.label);
+            }
           }
-        } catch { /* ignore */ }
-      }, 1000);
+        }
+        if (data.status === 'done') {
+          clearInterval(pollInterval);
+          eventSource.close();
+          clearInterval(timerInterval);
+          await fetchAndShowResults(jobId);
+        } else if (data.status === 'error') {
+          clearInterval(pollInterval);
+          eventSource.close();
+          clearInterval(timerInterval);
+          alert('Analysis failed: ' + (data.error || 'Unknown error'));
+          resetUI();
+        }
+      } catch { /* ignore */ }
+    }, 2000);
+
+    eventSource.onerror = () => {
+      // SSE connection lost — polling fallback will handle it
     };
   }
 
