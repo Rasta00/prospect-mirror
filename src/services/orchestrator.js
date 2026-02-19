@@ -35,9 +35,9 @@ async function runPipeline(jobId, url) {
 
     try {
       const { runAudits } = require('./audit-runner');
-      progress.start('audit', 'Running performance audits');
       auditData = await runAudits(url, progress);
     } catch (err) {
+      console.error('[Pipeline] Audit failed:', err.message);
       progress.fail('audit', err.message);
     }
 
@@ -46,6 +46,7 @@ async function runPipeline(jobId, url) {
         const { analyzeContent } = require('./content-analyzer');
         contentAnalysis = await analyzeContent(crawlData, brandData, techData, progress);
       } catch (err) {
+        console.error('[Pipeline] Content analysis failed:', err.message);
         progress.fail('contentAI', err.message);
       }
 
@@ -53,6 +54,7 @@ async function runPipeline(jobId, url) {
         const { analyzeCompetitive } = require('./competitive-analyzer');
         competitiveAnalysis = await analyzeCompetitive(crawlData, techData, auditData, progress);
       } catch (err) {
+        console.error('[Pipeline] Competitive analysis failed:', err.message);
         progress.fail('competitiveAI', err.message);
       }
     } else {

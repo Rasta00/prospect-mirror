@@ -7,7 +7,7 @@ module.exports = {
   gemini: {
     apiKey: process.env.GEMINI_API_KEY,
     enabled: process.env.ENABLE_AI_ANALYSIS !== 'false',
-    model: process.env.GEMINI_MODEL || 'gemini-2.0-flash',
+    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
     maxTokens: 4096,
     timeoutMs: 60_000,
   },

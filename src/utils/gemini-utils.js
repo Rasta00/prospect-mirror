@@ -5,9 +5,11 @@
 const config = require('../../config/default');
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
+const MAX_RETRIES = 3;
 
 /**
  * Send a prompt to Gemini and return the raw text response.
+ * Includes retry logic for 429 rate-limit errors.
  */
 async function askGemini(prompt, { maxTokens, systemPrompt } = {}) {
   const model = config.gemini.model;
@@ -27,23 +29,57 @@ async function askGemini(prompt, { maxTokens, systemPrompt } = {}) {
     body.systemInstruction = { parts: [{ text: systemPrompt }] };
   }
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(config.gemini.timeoutMs),
-  });
+  let lastError = null;
 
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`Gemini API error ${response.status}: ${err}`);
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(config.gemini.timeoutMs),
+      });
+
+      if (response.status === 429) {
+        // Rate limited — parse retry delay or use exponential backoff
+        const errBody = await response.json().catch(() => ({}));
+        const retryDetail = errBody.error?.details?.find(d => d.retryDelay);
+        const delaySec = retryDetail ? parseFloat(retryDetail.retryDelay) : (attempt + 1) * 15;
+        const delayMs = Math.min(Math.ceil(delaySec * 1000), 60_000);
+
+        console.warn(`[Gemini] Rate limited (429), retrying in ${Math.ceil(delaySec)}s (attempt ${attempt + 1}/${MAX_RETRIES})`);
+        await sleep(delayMs);
+        continue;
+      }
+
+      if (!response.ok) {
+        const err = await response.text();
+        throw new Error(`Gemini API error ${response.status}: ${err.slice(0, 300)}`);
+      }
+
+      const data = await response.json();
+      const text = data.candidates?.[0]?.content?.parts
+        ?.map(p => p.text)
+        ?.join('\n') || '';
+
+      if (!text) {
+        const blockReason = data.candidates?.[0]?.finishReason;
+        console.warn(`[Gemini] Empty response. finishReason: ${blockReason}`);
+      }
+
+      return text;
+    } catch (err) {
+      lastError = err;
+      if (err.name === 'TimeoutError') {
+        console.error(`[Gemini] Request timed out (attempt ${attempt + 1}/${MAX_RETRIES})`);
+        continue;
+      }
+      // Non-retryable error
+      throw err;
+    }
   }
 
-  const data = await response.json();
-  const text = data.candidates?.[0]?.content?.parts
-    ?.map(p => p.text)
-    ?.join('\n') || '';
-  return text;
+  throw lastError || new Error('Gemini API failed after retries');
 }
 
 /**
@@ -55,7 +91,11 @@ async function askGemini(prompt, { maxTokens, systemPrompt } = {}) {
  */
 async function askGeminiJson(prompt, { maxTokens, systemPrompt } = {}) {
   const text = await askGemini(prompt, { maxTokens, systemPrompt });
-  return extractJson(text);
+  const parsed = extractJson(text);
+  if (!parsed) {
+    console.error('[Gemini] Failed to extract JSON from response:', text.slice(0, 500));
+  }
+  return parsed;
 }
 
 /**
@@ -89,6 +129,10 @@ function extractJson(text) {
   }
 
   return null;
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 module.exports = { askGemini, askGeminiJson, extractJson };

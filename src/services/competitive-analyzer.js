@@ -201,6 +201,7 @@ Return ONLY the JSON object.`;
 
     return analysis;
   } catch (err) {
+    console.error('[CompetitiveAI] Gemini call failed:', err.message);
     progress.fail('competitiveAI', err.message);
     return null;
   }

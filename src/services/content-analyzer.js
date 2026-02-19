@@ -72,6 +72,7 @@ Return ONLY the JSON object, no other text.`;
 
     return analysis;
   } catch (err) {
+    console.error('[ContentAI] Gemini call failed:', err.message);
     progress.fail('contentAI', err.message);
     return null;
   }
