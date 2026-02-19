@@ -25,7 +25,7 @@ async function runPipeline(jobId, url) {
     // ── Phase 1b: Brand + Tech in parallel ──
     const [brandData, techData] = await Promise.all([
       extractBrand(crawlData, progress),
-      Promise.resolve(detectTech(crawlData, progress)),
+      detectTech(crawlData, progress),
     ]);
 
     // ── Phase 2: Audits + AI Analysis ──

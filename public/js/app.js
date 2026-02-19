@@ -396,17 +396,84 @@
       return;
     }
 
-    $('#tech-details').innerHTML = tech.detected.map(t => `
-      <div class="tech-card">
-        <div class="tech-icon">${escHtml(t.name.charAt(0))}</div>
-        <div>
-          <div class="tech-name">${escHtml(t.name)}</div>
-          <div class="tech-category">${escHtml(t.category)}</div>
-          <div class="tech-confidence">Confidence: ${t.confidence}%</div>
-          <div class="confidence-bar"><div class="confidence-fill" style="width:${t.confidence}%"></div></div>
+    const labels = tech.categoryLabels || {};
+    const summary = tech.summary || {};
+
+    // Category display order
+    const categoryOrder = [
+      'cms', 'framework', 'jslib', 'css', 'ecommerce',
+      'analytics', 'tag_manager', 'marketing', 'testing', 'personalization',
+      'chat', 'cdn', 'hosting', 'server', 'security',
+      'media', 'fonts', 'consent', 'payment', 'accessibility', 'ai_detected',
+    ];
+
+    // Category icons
+    const categoryIcons = {
+      cms: '📝', framework: '⚛️', jslib: '📦', css: '🎨', ecommerce: '🛒',
+      analytics: '📊', tag_manager: '🏷️', marketing: '📧', testing: '🧪', personalization: '🎯',
+      chat: '💬', cdn: '⚡', hosting: '☁️', server: '🖥️', security: '🔒',
+      media: '🎬', fonts: '🔤', consent: '🍪', payment: '💳', accessibility: '♿', ai_detected: '🤖',
+    };
+
+    // Tech count header
+    let html = `<div class="tech-summary-bar">
+      <span class="tech-total">${tech.detected.length} technologies detected</span>
+      <span class="tech-categories">${Object.keys(summary).length} categories</span>
+    </div>`;
+
+    // Render each category that has items
+    for (const cat of categoryOrder) {
+      const items = summary[cat];
+      if (!items?.length) continue;
+
+      const label = labels[cat] || humanize(cat);
+      const icon = categoryIcons[cat] || '🔧';
+
+      html += `<div class="tech-category-group">
+        <div class="tech-category-header">
+          <span class="tech-category-icon">${icon}</span>
+          <span class="tech-category-label">${escHtml(label)}</span>
+          <span class="tech-category-count">${items.length}</span>
         </div>
-      </div>
-    `).join('');
+        <div class="tech-category-items">
+          ${items.map(t => `
+            <div class="tech-card">
+              <div class="tech-card-main">
+                <div class="tech-name">${escHtml(t.name)}${t.version ? ` <span class="tech-version">${escHtml(t.version)}</span>` : ''}</div>
+                <div class="confidence-bar"><div class="confidence-fill" style="width:${t.confidence}%"></div></div>
+              </div>
+              <div class="tech-confidence-value">${t.confidence}%</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    }
+
+    // Handle any categories not in our order
+    for (const [cat, items] of Object.entries(summary)) {
+      if (categoryOrder.includes(cat) || !items?.length) continue;
+      const label = labels[cat] || humanize(cat);
+      html += `<div class="tech-category-group">
+        <div class="tech-category-header">
+          <span class="tech-category-icon">🔧</span>
+          <span class="tech-category-label">${escHtml(label)}</span>
+          <span class="tech-category-count">${items.length}</span>
+        </div>
+        <div class="tech-category-items">
+          ${items.map(t => `
+            <div class="tech-card">
+              <div class="tech-card-main">
+                <div class="tech-name">${escHtml(t.name)}${t.version ? ` <span class="tech-version">${escHtml(t.version)}</span>` : ''}</div>
+                <div class="confidence-bar"><div class="confidence-fill" style="width:${t.confidence}%"></div></div>
+              </div>
+              <div class="tech-confidence-value">${t.confidence}%</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    }
+
+    $('#tech-details').innerHTML = html;
   }
 
   function renderAudit(audit) {
