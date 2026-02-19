@@ -419,38 +419,89 @@
       return;
     }
 
-    // Gauge cards
-    gaugesEl.innerHTML = Object.entries(audit.scores).map(([key, val]) => `
-      <div class="gauge-card">
+    // Clickable gauge cards
+    const categoryKeys = Object.keys(audit.scores);
+    gaugesEl.innerHTML = categoryKeys.map(key => `
+      <div class="gauge-card gauge-card-clickable" data-category="${key}">
         <h4>${humanize(key)}</h4>
-        <div class="gauge-value ${scoreClass(val)}">${val}</div>
-        <div class="gauge-label">${scoreLabel(val)}</div>
+        <div class="gauge-value ${scoreClass(audit.scores[key])}">${audit.scores[key]}</div>
+        <div class="gauge-label">${scoreLabel(audit.scores[key])}</div>
+        <div class="gauge-hint">Click for details</div>
       </div>
     `).join('');
 
-    // Security headers
-    if (audit.securityHeaders) {
-      detailsEl.innerHTML = `
-        <div class="content-section">
-          <h3>Security Headers</h3>
-          <table class="comparison-table">
-            <thead><tr><th>Header</th><th>Status</th></tr></thead>
-            <tbody>
-              ${Object.entries(audit.securityHeaders).map(([h, present]) =>
-                `<tr><td><code>${escHtml(h)}</code></td><td>${present ? '✓ Present' : '✗ Missing'}</td></tr>`
-              ).join('')}
-            </tbody>
-          </table>
-        </div>`;
+    // Default: show overview with radar chart
+    renderAuditOverview(audit, detailsEl);
+
+    // Click handler for gauge cards
+    gaugesEl.addEventListener('click', (e) => {
+      const card = e.target.closest('.gauge-card-clickable');
+      if (!card) return;
+
+      const category = card.dataset.category;
+
+      // Toggle active state
+      $$('.gauge-card-clickable').forEach(c => c.classList.remove('gauge-active'));
+      card.classList.add('gauge-active');
+
+      // Render findings for this category
+      const findings = audit.categoryDetails?.[category] || [];
+      renderCategoryFindings(category, audit.scores[category], findings, detailsEl);
+    });
+  }
+
+  function renderAuditOverview(audit, container) {
+    let html = '';
+
+    // Key metrics
+    if (audit.diagnostics) {
+      const d = audit.diagnostics;
+      const metrics = [
+        { label: 'First Contentful Paint', value: d.fcp },
+        { label: 'Largest Contentful Paint', value: d.lcp },
+        { label: 'Total Blocking Time', value: d.tbt },
+        { label: 'Cumulative Layout Shift', value: d.cls },
+        { label: 'Speed Index', value: d.speedIndex },
+      ].filter(m => m.value);
+
+      if (metrics.length) {
+        html += `<div class="content-section"><h3>Key Metrics</h3>
+          <div class="metrics-grid">${metrics.map(m =>
+            `<div class="metric-item"><span class="metric-label">${m.label}</span><span class="metric-value">${m.value}</span></div>`
+          ).join('')}</div></div>`;
+      }
     }
 
+    // Quick summary of issues per category
+    if (audit.categoryDetails) {
+      const summaryRows = Object.entries(audit.categoryDetails).map(([key, findings]) => {
+        const fails = findings.filter(f => f.status === 'fail').length;
+        const warnings = findings.filter(f => f.status === 'warning').length;
+        const passes = findings.filter(f => f.status === 'pass').length;
+        return `<tr class="summary-row-clickable" data-category="${key}">
+          <td><strong>${humanize(key)}</strong></td>
+          <td><span class="gauge-value ${scoreClass(audit.scores[key])}" style="font-size:1.2rem">${audit.scores[key]}</span></td>
+          <td>${fails ? `<span class="finding-badge fail">${fails} failed</span>` : ''}</td>
+          <td>${warnings ? `<span class="finding-badge warning">${warnings} warnings</span>` : ''}</td>
+          <td><span class="finding-badge pass">${passes} passed</span></td>
+        </tr>`;
+      }).join('');
+
+      html += `<div class="content-section"><h3>Audit Summary</h3>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:12px">Click a category above or a row below to see detailed findings.</p>
+        <table class="comparison-table"><thead><tr><th>Category</th><th>Score</th><th>Failures</th><th>Warnings</th><th>Passed</th></tr></thead>
+        <tbody>${summaryRows}</tbody></table></div>`;
+    }
+
+    container.innerHTML = html;
+
     // Radar chart
-    if (typeof Chart !== 'undefined') {
+    if (typeof Chart !== 'undefined' && audit.scores) {
       const canvas = document.createElement('canvas');
       canvas.id = 'radar-chart';
       canvas.style.maxWidth = '400px';
       canvas.style.margin = '20px auto';
-      detailsEl.prepend(canvas);
+      container.prepend(canvas);
 
       new Chart(canvas, {
         type: 'radar',
@@ -470,6 +521,97 @@
         },
       });
     }
+
+    // Click handler for summary rows
+    container.addEventListener('click', (e) => {
+      const row = e.target.closest('.summary-row-clickable');
+      if (!row) return;
+      const category = row.dataset.category;
+      // Activate the gauge card
+      $$('.gauge-card-clickable').forEach(c => c.classList.remove('gauge-active'));
+      const card = $(`.gauge-card-clickable[data-category="${category}"]`);
+      if (card) card.classList.add('gauge-active');
+      // Render findings
+      const findings = result?.audit?.categoryDetails?.[category] || [];
+      renderCategoryFindings(category, result?.audit?.scores?.[category], findings, container);
+    });
+  }
+
+  function renderCategoryFindings(category, score, findings, container) {
+    const fails = findings.filter(f => f.status === 'fail');
+    const warnings = findings.filter(f => f.status === 'warning');
+    const passes = findings.filter(f => f.status === 'pass');
+    const infos = findings.filter(f => f.status === 'info');
+
+    let html = `<div class="findings-header">
+      <button class="findings-back" onclick="document.querySelector('.gauge-card-clickable.gauge-active')?.classList.remove('gauge-active')">← Back to Overview</button>
+      <h3>${humanize(category)} — <span class="gauge-value ${scoreClass(score)}" style="font-size:1.3rem">${score}/100</span></h3>
+      <div class="findings-summary">
+        ${fails.length ? `<span class="finding-badge fail">${fails.length} failed</span>` : ''}
+        ${warnings.length ? `<span class="finding-badge warning">${warnings.length} warnings</span>` : ''}
+        ${passes.length ? `<span class="finding-badge pass">${passes.length} passed</span>` : ''}
+      </div>
+    </div>`;
+
+    // Back button handler
+    setTimeout(() => {
+      const backBtn = container.querySelector('.findings-back');
+      if (backBtn) {
+        backBtn.addEventListener('click', () => {
+          renderAuditOverview(result?.audit, container);
+        });
+      }
+    }, 0);
+
+    // Failures
+    if (fails.length) {
+      html += `<div class="findings-group"><h4 class="findings-group-title fail-title">Failures</h4>`;
+      html += fails.map(f => renderFinding(f)).join('');
+      html += `</div>`;
+    }
+
+    // Warnings
+    if (warnings.length) {
+      html += `<div class="findings-group"><h4 class="findings-group-title warning-title">Warnings</h4>`;
+      html += warnings.map(f => renderFinding(f)).join('');
+      html += `</div>`;
+    }
+
+    // Info
+    if (infos.length) {
+      html += `<div class="findings-group"><h4 class="findings-group-title info-title">Diagnostics</h4>`;
+      html += infos.map(f => renderFinding(f)).join('');
+      html += `</div>`;
+    }
+
+    // Passed (collapsed)
+    if (passes.length) {
+      html += `<details class="findings-group passed-group"><summary class="findings-group-title pass-title">Passed Audits (${passes.length})</summary>`;
+      html += passes.map(f => renderFinding(f)).join('');
+      html += `</details>`;
+    }
+
+    container.innerHTML = html;
+  }
+
+  function renderFinding(f) {
+    const icon = f.status === 'fail' ? '✗' : f.status === 'warning' ? '⚠' : f.status === 'pass' ? '✓' : 'ℹ';
+    const iconClass = f.status;
+
+    let html = `<div class="finding-card ${f.status}">
+      <div class="finding-icon ${iconClass}">${icon}</div>
+      <div class="finding-content">
+        <div class="finding-title">${escHtml(f.title)}${f.displayValue ? ` <span class="finding-value">${escHtml(f.displayValue)}</span>` : ''}</div>
+        <div class="finding-desc">${escHtml(f.description)}</div>`;
+
+    if (f.items?.length) {
+      html += `<ul class="finding-items">${f.items.map(item =>
+        `<li>${escHtml(item)}</li>`
+      ).join('')}</ul>`;
+    }
+
+    html += `</div></div>`;
+    return html;
   }
 
   function renderCompetitive(comp) {

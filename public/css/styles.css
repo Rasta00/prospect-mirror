@@ -546,6 +546,170 @@ body {
   color: var(--text-muted);
   margin-top: var(--space-xs);
 }
+.gauge-hint {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: var(--space-sm);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.gauge-card-clickable {
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.gauge-card-clickable:hover {
+  border-color: var(--acquia-blue);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+.gauge-card-clickable:hover .gauge-hint { opacity: 1; }
+.gauge-card-clickable.gauge-active {
+  border-color: var(--acquia-blue);
+  border-width: 2px;
+  background: var(--acquia-light);
+}
+.gauge-card-clickable.gauge-active .gauge-hint {
+  opacity: 1;
+  color: var(--acquia-blue);
+}
+
+/* ---- Key Metrics ---- */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-sm);
+}
+.metric-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--bg);
+  border-radius: var(--radius);
+}
+.metric-label { font-size: 0.85rem; color: var(--text-secondary); }
+.metric-value { font-weight: 600; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+
+/* ---- Findings ---- */
+.findings-header {
+  margin-bottom: var(--space-lg);
+}
+.findings-back {
+  background: none;
+  border: none;
+  color: var(--acquia-blue);
+  font-family: var(--font);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: var(--space-sm);
+}
+.findings-back:hover { text-decoration: underline; }
+.findings-header h3 {
+  font-size: 1.25rem;
+  margin-bottom: var(--space-sm);
+}
+.findings-summary {
+  display: flex;
+  gap: var(--space-sm);
+}
+.finding-badge {
+  display: inline-block;
+  padding: 2px var(--space-sm);
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.finding-badge.fail { background: #FEE2E2; color: #991B1B; }
+.finding-badge.warning { background: #FEF3C7; color: #92400E; }
+.finding-badge.pass { background: #D1FAE5; color: #065F46; }
+
+.findings-group {
+  margin-bottom: var(--space-lg);
+}
+.findings-group-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-sm);
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--border);
+}
+.fail-title { color: var(--error); }
+.warning-title { color: var(--warning); }
+.pass-title { color: var(--success); cursor: pointer; }
+.info-title { color: var(--info); }
+
+.passed-group > summary { list-style: none; }
+.passed-group > summary::before { content: '▶ '; font-size: 0.7rem; }
+.passed-group[open] > summary::before { content: '▼ '; }
+
+.finding-card {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-sm);
+  border-left: 3px solid var(--border);
+}
+.finding-card.fail { border-left-color: var(--error); }
+.finding-card.warning { border-left-color: var(--warning); }
+.finding-card.pass { border-left-color: var(--success); }
+.finding-card.info { border-left-color: var(--info); }
+
+.finding-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.finding-icon.fail { color: var(--error); }
+.finding-icon.warning { color: var(--warning); }
+.finding-icon.pass { color: var(--success); }
+.finding-icon.info { color: var(--info); }
+
+.finding-content { flex: 1; min-width: 0; }
+.finding-title {
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+}
+.finding-value {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-left: var(--space-xs);
+}
+.finding-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.finding-items {
+  margin-top: var(--space-sm);
+  padding-left: var(--space-md);
+  list-style: none;
+}
+.finding-items li {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  padding: 2px 0;
+  font-family: var(--mono);
+  word-break: break-all;
+}
+.finding-items li::before {
+  content: '→ ';
+  color: var(--text-muted);
+}
+
+.summary-row-clickable { cursor: pointer; }
+.summary-row-clickable:hover { background: var(--acquia-light); }
 
 /* ---- Competitive Analysis ---- */
 .comparison-table {
