@@ -1,8 +1,8 @@
 /**
- * AI Content Analysis via Claude.
+ * AI Content Analysis via Gemini.
  * Determines industry, themes, messaging, target audience, and content types.
  */
-const { askClaudeJson } = require('../utils/claude-utils');
+const { askGeminiJson } = require('../utils/gemini-utils');
 
 /**
  * Analyze content with Claude.
@@ -56,11 +56,11 @@ Analyze this website and return a JSON object with these fields:
 Return ONLY the JSON object, no other text.`;
 
   try {
-    progress.progress('contentAI', 50, 'Analyzing with Claude');
-    const analysis = await askClaudeJson(prompt);
+    progress.progress('contentAI', 50, 'Analyzing with Gemini');
+    const analysis = await askGeminiJson(prompt);
 
     if (!analysis) {
-      progress.fail('contentAI', 'Failed to parse Claude response');
+      progress.fail('contentAI', 'Failed to parse Gemini response');
       return null;
     }
 

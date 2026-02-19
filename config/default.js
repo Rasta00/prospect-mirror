@@ -4,10 +4,10 @@ require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
 module.exports = {
   port: parseInt(process.env.PORT, 10) || 3000,
 
-  anthropic: {
-    apiKey: process.env.ANTHROPIC_API_KEY,
+  gemini: {
+    apiKey: process.env.GEMINI_API_KEY,
     enabled: process.env.ENABLE_AI_ANALYSIS !== 'false',
-    model: 'claude-sonnet-4-5-20250929',
+    model: process.env.GEMINI_MODEL || 'gemini-2.0-flash',
     maxTokens: 4096,
     timeoutMs: 60_000,
   },

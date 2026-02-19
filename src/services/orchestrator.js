@@ -41,7 +41,7 @@ async function runPipeline(jobId, url) {
       progress.fail('audit', err.message);
     }
 
-    if (config.anthropic.enabled && config.anthropic.apiKey && !config.anthropic.apiKey.startsWith('sk-ant-...')) {
+    if (config.gemini.enabled && config.gemini.apiKey) {
       try {
         const { analyzeContent } = require('./content-analyzer');
         contentAnalysis = await analyzeContent(crawlData, brandData, techData, progress);

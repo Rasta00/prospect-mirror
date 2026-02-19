@@ -53,6 +53,6 @@ app.get('*', (req, res) => {
 
 app.listen(config.port, '0.0.0.0', () => {
   console.log(`\n  Prospect Mirror running at http://localhost:${config.port}\n`);
-  console.log(`  Anthropic API: ${config.anthropic.apiKey ? 'configured' : 'NOT SET'}`);
+  console.log(`  Gemini AI: ${config.gemini.apiKey ? 'configured' : 'NOT SET'}`);
   console.log(`  Drupal population: ${config.drupal.enabled ? config.drupal.baseUrl : 'disabled'}\n`);
 });

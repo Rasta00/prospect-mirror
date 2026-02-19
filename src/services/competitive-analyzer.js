@@ -2,7 +2,7 @@
  * AI Competitive Analysis via Claude.
  * Generates a platform comparison with Acquia strengths highlighted.
  */
-const { askClaudeJson } = require('../utils/claude-utils');
+const { askGeminiJson } = require('../utils/gemini-utils');
 
 /**
  * Platform-specific talking points for comparison.
@@ -167,8 +167,8 @@ Tailor everything to this specific prospect — reference their actual scores an
 Return ONLY the JSON object.`;
 
   try {
-    progress.progress('competitiveAI', 40, 'Generating competitive analysis with Claude');
-    const analysis = await askClaudeJson(prompt, { maxTokens: 4096 });
+    progress.progress('competitiveAI', 40, 'Generating competitive analysis with Gemini');
+    const analysis = await askGeminiJson(prompt, { maxTokens: 4096 });
 
     if (!analysis) {
       // Fallback to static intel
