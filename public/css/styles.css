@@ -89,8 +89,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - 200px);
-  padding: var(--space-3xl) var(--space-xl);
+  min-height: calc(100vh - 260px);
+  padding: var(--space-xl) var(--space-xl) var(--space-lg);
 }
 .input-container {
   text-align: center;
@@ -107,7 +107,7 @@ body {
 .subtitle {
   color: var(--text-secondary);
   font-size: 1.1rem;
-  margin-bottom: var(--space-2xl);
+  margin-bottom: var(--space-lg);
 }
 .url-form {
   width: 100%;
@@ -178,7 +178,7 @@ body {
 
 /* ---- Progress Section ---- */
 .progress-section {
-  padding: var(--space-2xl) var(--space-xl);
+  padding: var(--space-lg) var(--space-xl);
   max-width: 800px;
   margin: 0 auto;
 }
@@ -186,7 +186,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-md);
 }
 .progress-header h2 {
   font-size: 1.25rem;
@@ -270,7 +270,7 @@ body {
 
 /* ---- Results Section ---- */
 .results-section {
-  padding: var(--space-lg) var(--space-xl) var(--space-3xl);
+  padding: var(--space-md) var(--space-xl) var(--space-2xl);
 }
 .results-container {
   max-width: 1200px;
@@ -366,6 +366,25 @@ body {
 }
 .overview-card.wide {
   grid-column: 1 / -1;
+}
+.comp-narrative.truncated {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.read-more-btn {
+  background: none;
+  border: none;
+  color: var(--acquia-blue);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: var(--space-xs) 0;
+  margin-top: var(--space-xs);
+}
+.read-more-btn:hover {
+  text-decoration: underline;
 }
 .overview-card h3 {
   font-size: 0.8rem;

@@ -354,7 +354,11 @@
     // Competitive preview
     const compEl = $('#competitive-preview');
     if (r.competitive?.narrative) {
-      compEl.innerHTML = `<p style="font-size:0.9rem;line-height:1.6">${escHtml(r.competitive.narrative).slice(0, 300)}...</p>`;
+      const full = escHtml(r.competitive.narrative);
+      const needsTruncate = full.length > 300;
+      compEl.innerHTML = `
+        <p class="comp-narrative${needsTruncate ? ' truncated' : ''}" style="font-size:0.9rem;line-height:1.6">${full}</p>
+        ${needsTruncate ? '<button class="read-more-btn" onclick="this.previousElementSibling.classList.toggle(\'truncated\');this.textContent=this.previousElementSibling.classList.contains(\'truncated\')?\'Read more \u25BE\':\'Show less \u25B4\'">Read more \u25BE</button>' : ''}`;
     } else {
       compEl.innerHTML = '<p style="color:var(--text-muted)">Competitive analysis not yet available</p>';
     }
