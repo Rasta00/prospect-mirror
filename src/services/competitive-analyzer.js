@@ -13,13 +13,13 @@ const PLATFORM_INTEL = {
       'Plugin security vulnerabilities (40% of web, #1 target)',
       'Performance degrades with plugin bloat',
       'Limited enterprise governance and workflows',
-      'No native personalization or CDP integration',
+      'No native personalization capabilities',
       'Multisite management is complex at scale',
     ],
     acquiaAdvantages: [
       'Enterprise-grade security with automated patching',
       'Built-in personalization engine (Acquia Personalization)',
-      'Native CDP for unified customer profiles',
+      'Unified customer profiles for targeted experiences',
       'Drupal\'s granular permissions and content workflows',
       'Acquia Cloud autoscaling for traffic spikes',
     ],
@@ -99,7 +99,7 @@ const PLATFORM_INTEL = {
     acquiaAdvantages: [
       'Modern, proven platform with 20+ years of development',
       'Managed cloud infrastructure — focus on content, not servers',
-      'Built-in personalization, CDP, and DAM',
+      'Built-in personalization and DAM capabilities',
       'API-first architecture for any frontend',
       'Continuous innovation backed by Acquia + open source community',
     ],
@@ -164,6 +164,14 @@ Generate a competitive analysis JSON with these fields:
 
 Make the comparison table have 6-8 rows covering the most important capabilities.
 Tailor everything to this specific prospect — reference their actual scores and tech stack.
+
+IMPORTANT: Do NOT mention the following Acquia products — they should not appear anywhere in the output:
+- Content Hub
+- CDP (Customer Data Platform)
+- Campaign Studio
+- Code Studio
+Focus on Acquia Cloud, Acquia Personalization, Site Studio, Drupal CMS, and the open source ecosystem.
+
 Return ONLY the JSON object.`;
 
   try {
