@@ -60,8 +60,8 @@ Return ONLY the JSON object, no other text.`;
     const analysis = await askGeminiJson(prompt);
 
     if (!analysis) {
-      progress.fail('contentAI', 'Failed to parse Gemini response');
-      return null;
+      progress.progress('contentAI', 80, 'AI response could not be parsed, using basic analysis');
+      return buildBasicAnalysis(crawlData, techData, 'AI response could not be parsed — showing basic metadata only.');
     }
 
     progress.complete('contentAI', {
@@ -73,9 +73,43 @@ Return ONLY the JSON object, no other text.`;
     return analysis;
   } catch (err) {
     console.error('[ContentAI] Gemini call failed:', err.message);
-    progress.fail('contentAI', err.message);
-    return null;
+    progress.progress('contentAI', 80, 'AI unavailable, using basic analysis');
+    const errorMsg = err.code === 'QUOTA_EXHAUSTED'
+      ? 'AI credits exhausted — showing basic metadata extracted from the page.'
+      : `AI analysis unavailable (${err.message}) — showing basic metadata.`;
+    const basic = buildBasicAnalysis(crawlData, techData, errorMsg);
+    progress.complete('contentAI', { source: 'basic', industry: basic.industry });
+    return basic;
   }
+}
+
+/**
+ * Build a basic content analysis from crawl metadata when AI is unavailable.
+ */
+function buildBasicAnalysis(crawlData, techData, errorMsg) {
+  const title = crawlData.title || '';
+  const description = crawlData.meta?.description || '';
+  const siteName = crawlData.meta?.siteName || title;
+
+  return {
+    _aiError: errorMsg,
+    companyName: siteName || null,
+    industry: 'Not determined (AI unavailable)',
+    subIndustry: null,
+    themes: description ? description.split(/[,.]/).map(s => s.trim()).filter(s => s.length > 3 && s.length < 60).slice(0, 3) : [],
+    messaging: description || 'No description available.',
+    targetAudience: null,
+    valueProposition: description || null,
+    contentTypes: [],
+    contentMaturity: null,
+    personalization: null,
+    seoSignals: {
+      hasStructuredData: (crawlData.rawHtml || '').includes('application/ld+json'),
+      hasSitemap: null,
+      hasCanonical: (crawlData.rawHtml || '').includes('rel="canonical"'),
+      metaDescriptionQuality: description ? (description.length > 50 ? 'Good' : 'Fair') : 'Missing',
+    },
+  };
 }
 
 module.exports = { analyzeContent };

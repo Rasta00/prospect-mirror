@@ -212,8 +212,29 @@ Return ONLY the JSON object.`;
     return analysis;
   } catch (err) {
     console.error('[CompetitiveAI] Gemini call failed:', err.message);
-    progress.fail('competitiveAI', err.message);
-    return null;
+    // Fall back to static intel instead of returning null
+    progress.progress('competitiveAI', 80, 'AI unavailable, using platform analysis');
+    const fallback = {
+      _aiError: err.code === 'QUOTA_EXHAUSTED'
+        ? 'AI credits exhausted — competitive analysis generated from platform signatures instead.'
+        : `AI analysis unavailable (${err.message}) — showing platform-based analysis.`,
+      narrative: `${crawlData.title || 'This site'} appears to run on ${primaryCms}. Based on our platform analysis and audit scores, there are several areas where Acquia could provide significant improvements.`,
+      comparison: intel.acquiaAdvantages.map((adv, i) => ({
+        capability: ['Performance', 'Security', 'Personalization', 'Content Mgmt', 'Developer Experience'][i] || 'Feature',
+        current: intel.weaknesses[i] || 'Limited',
+        acquia: adv,
+      })),
+      weaknesses: intel.weaknesses.slice(0, 3),
+      acquiaAdvantages: intel.acquiaAdvantages,
+      talkingPoints: [
+        `Their ${primaryCms} site scores ${scores.performance || '?'}/100 on performance — Acquia Cloud can significantly improve this.`,
+        `Security posture could be stronger — Acquia provides enterprise-grade security out of the box.`,
+        `Open source means lower TCO and no vendor lock-in.`,
+      ],
+      riskFactors: [],
+    };
+    progress.complete('competitiveAI', { source: 'fallback', cms: primaryCms });
+    return fallback;
   }
 }
 

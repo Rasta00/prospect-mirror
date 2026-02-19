@@ -79,6 +79,13 @@ async function askGemini(prompt, { maxTokens, systemPrompt } = {}) {
     }
   }
 
+  // If all retries were 429s, throw a clear quota error
+  const msg = lastError?.message || '';
+  if (msg.includes('429') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('quota')) {
+    const err = new Error('AI credits exhausted — Gemini API free tier quota exceeded. Check your plan at https://ai.google.dev/pricing');
+    err.code = 'QUOTA_EXHAUSTED';
+    throw err;
+  }
   throw lastError || new Error('Gemini API failed after retries');
 }
 

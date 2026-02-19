@@ -354,9 +354,10 @@
     // Competitive preview
     const compEl = $('#competitive-preview');
     if (r.competitive?.narrative) {
+      const aiNotice = r.competitive._aiError ? `<div class="ai-notice-mini">${escHtml(r.competitive._aiError)}</div>` : '';
       const full = escHtml(r.competitive.narrative);
       const needsTruncate = full.length > 300;
-      compEl.innerHTML = `
+      compEl.innerHTML = `${aiNotice}
         <p class="comp-narrative${needsTruncate ? ' truncated' : ''}" style="font-size:0.9rem;line-height:1.6">${full}</p>
         ${needsTruncate ? '<button class="read-more-btn" onclick="this.previousElementSibling.classList.toggle(\'truncated\');this.textContent=this.previousElementSibling.classList.contains(\'truncated\')?\'Read more \u25BE\':\'Show less \u25B4\'">Read more \u25BE</button>' : ''}`;
     } else {
@@ -694,6 +695,11 @@
 
     let html = '';
 
+    // AI error banner
+    if (comp._aiError) {
+      html += renderAiNotice(comp._aiError);
+    }
+
     // Comparison table
     if (comp.comparison) {
       html += `
@@ -752,6 +758,11 @@
 
     let html = '';
 
+    // AI error banner
+    if (content._aiError) {
+      html += renderAiNotice(content._aiError);
+    }
+
     if (content.industry) {
       html += `<div class="content-section"><h3>Industry</h3><div class="tag">${escHtml(content.industry)}</div></div>`;
     }
@@ -793,6 +804,10 @@
   }
 
   // ---- Helpers ----
+  function renderAiNotice(msg) {
+    return `<div class="ai-notice"><span class="ai-notice-icon">⚠</span><span>${escHtml(msg)}</span></div>`;
+  }
+
   function scoreClass(v) {
     if (v >= 90) return 'good';
     if (v >= 50) return 'ok';

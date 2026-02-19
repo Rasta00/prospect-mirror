@@ -874,6 +874,33 @@ body {
   margin-bottom: var(--space-md);
 }
 
+/* ---- AI Notice Banners ---- */
+.ai-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  background: #FEF3C7;
+  border: 1px solid #F59E0B;
+  border-radius: var(--radius);
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-md);
+  font-size: 0.85rem;
+  color: #92400E;
+  line-height: 1.5;
+}
+.ai-notice-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+.ai-notice-mini {
+  font-size: 0.8rem;
+  color: #92400E;
+  background: #FEF3C7;
+  border-radius: var(--radius);
+  padding: var(--space-xs) var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 768px) {
   .overview-grid, .brand-grid { grid-template-columns: 1fr; }
